@@ -1,12 +1,71 @@
 body {
-  background: #000000 url('bg.jpg') fixed center;
-  background-size: 100%;
+  background: #000000 url('images/bg.jpg') fixed center no-repeat;
+  background-size: 120%;
+  margin: 0;
+  font: 18px Verdana;
+  color: #303030;
 }
 
-#slogan {
-  position: absolute;
-  top: 100px;
-  left: 100px;
-  color: white;
-  font: 14px Verdana;
+h1 {
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px #dedede, 0 -1px 0 #000;
+  font-size: 50px;
+  opacity: 0.85;
+}
+
+#content {
+  width: 100%;
+  height: 100%;
+  background: rgba(200, 200, 200, 0.4);
+}
+
+#central {
+  position: relative;
+  margin: 0 auto;
+  width: 600px;
+  /* background: rgba(200, 200, 200, 0.8); */
+  border-radius: 30px;
+}
+
+#name {
+  padding: 5px;
+}
+
+#social {
+  padding: 5px;
+  height: 306px;
+}
+
+#social h2 {
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+#social hr {
+  margin: 0;
+  border: none;
+}
+
+.row {
+  margin: 1px;
+  background: rgba(200, 200, 200, 0.8);
+}
+
+a {
+  color: #303030;
+  text-decoration: none;
+}
+
+.row img {
+  position: relative;
+  top: 2px;
+  left: 2px;
+  opacity: 0.7;
+}
+
+.row span {
+  position: relative;
+  top: -7px;
 }
