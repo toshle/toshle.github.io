@@ -41,11 +41,7 @@ h1 {
 #social h2 {
   font-style: italic;
   margin-bottom: 10px;
-}
-
-#social hr {
-  margin: 0;
-  border: none;
+  opacity: 0.9;
 }
 
 .row {
