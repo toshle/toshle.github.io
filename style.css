@@ -1,5 +1,5 @@
 body {
-  background: #000000 url('images/bg.jpg') fixed center no-repeat;
+  background: #FFF url('images/bg.jpg') fixed center no-repeat;
   background-size: 120%;
   margin: 0;
   font: 18px Verdana;
@@ -16,16 +16,17 @@ h1 {
 }
 
 #content {
+  position: fixed;
   width: 100%;
   height: 100%;
   background: rgba(200, 200, 200, 0.4);
+  overflow: auto;
 }
 
 #central {
-  position: relative;
   margin: 0 auto;
   width: 600px;
-  /* background: rgba(200, 200, 200, 0.8); */
+  height: 100%;
   border-radius: 30px;
 }
 
