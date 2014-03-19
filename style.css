@@ -54,6 +54,10 @@ a {
   text-decoration: none;
 }
 
+.row:hover img {
+  opacity: 1.0;
+}
+
 .row img {
   position: relative;
   top: 2px;
