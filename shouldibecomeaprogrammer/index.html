@@ -30,15 +30,11 @@
 		left:0;
 	}
 
-	#bottom > img {
-		display:block;
-		margin:auto;
-	}
-
 	.hidden {display:none;}
 
 	#NO {
-		font-size: 250px;
+		margin: 0 auto;
+		font-size: 450px;
 	}
 	</style>
 </head>
@@ -53,13 +49,19 @@
 	</div>
 
 	<div id="bottom" data-300="opacity:0;" data-600="opacity:1;">
-		<p id="NO">НЕ</p>
+		<p data-500="margin-right[vibrate]:0px;" data-end="margin-right[vibrate]:5px;" id="NO">НЕ</p>
 	</div>
 
 	<script type="text/javascript" src="skrollr.min.js"></script>
 
 	<script type="text/javascript">
-	skrollr.init();
+	skrollr.init({
+		easing: {
+			vibrate: function(p) {
+				return Math.sin(p * 50 * Math.PI);
+			}
+		}
+	});
 	</script>
 </body>
 
