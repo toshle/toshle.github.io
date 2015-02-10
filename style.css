@@ -3,6 +3,7 @@ body {
   font: 18px Verdana;
   color: #303030;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1 {
