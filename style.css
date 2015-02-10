@@ -1,6 +1,5 @@
 body {
-  background: #FFF url('images/bg.jpg') fixed center no-repeat;
-  background-size: cover;
+  background-color: #FFF;
   font: 18px Verdana;
   color: #303030;
   margin: 0;
