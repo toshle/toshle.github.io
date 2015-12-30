@@ -1,0 +1,177 @@
+<html>
+  <head>
+    <title>A*/etc.</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+    var init = function() {
+      var width = 20;
+      var height = 10;
+      var wallDensity = 80; // 0 до 100, колкото по високо толкова по малко стени
+
+      
+      var grid = new Array(width);
+      var nodeName = 0;
+      for(var x = 0; x < grid.length; x++) {
+        grid[x] = new Array(height);
+        for(var y = 0; y < grid[x].length; y++) {
+          grid[x][y] = {
+            type: 0,
+            name: nodeName,
+            pos: [x, y]
+          };
+          nodeName++;
+        } 
+      }
+
+      var astar = {
+        init: function(grid) {
+          for(var x = 0; x < grid.length; x++) {
+            for(var y = 0; y < grid[x].length; y++) {
+              grid[x][y].f = 0;
+              grid[x][y].g = 0;
+              grid[x][y].h = 0;
+              grid[x][y].parent = null;
+            } 
+          }
+        },
+        search: function(grid, start, end) {
+          astar.init(grid);
+          start.type = 1;
+          end.type = 2;
+          var openList   = [];
+          var closedList = [];
+          openList.push(start);
+       
+          while(openList.length > 0) {
+       
+            var min = 0;
+            for(var i=0; i<openList.length; i++) {
+              if(openList[i].f < openList[min].f) {
+                min = i;
+              }
+            }
+            var currentNode = openList[min];
+       
+            if(currentNode.pos == end.pos) {
+              var curr = currentNode;
+              var ret = [];
+              while(curr.parent) {
+                curr.type = 3;
+                ret.push(curr.name);
+                curr = curr.parent;
+              }
+              end.type = 2;
+              return ret.reverse();
+            }
+       
+            openList.splice(openList.indexOf(currentNode), 1);
+            closedList.push(currentNode);
+            var neighbors = astar.neighbors(grid, currentNode);
+       
+            for(var i=0; i<neighbors.length;i++) {
+              var neighbor = neighbors[i];
+              if(closedList.indexOf(neighbor) != -1 || neighbor.type == -1 ) {
+                continue;
+              }
+
+              var g = currentNode.g + 1;
+              var isBest = false;
+
+              if(openList.indexOf(neighbor) == -1) {
+                isBest = true;
+                neighbor.h = astar.heuristic(neighbor.pos, end.pos);
+                openList.push(neighbor);
+              }
+              else if(g < neighbor.g) {
+                isBest = true;
+              }
+
+              if(isBest) {
+                neighbor.parent = currentNode;
+                neighbor.g = g;
+                neighbor.f = neighbor.g + neighbor.h;
+              }
+            }
+          }
+       
+          return [];
+        },
+        heuristic: function(pos0, pos1) {
+          //mandist
+          var d1 = Math.abs (pos1[0] - pos0[0]);
+          var d2 = Math.abs (pos1[1] - pos0[1]);
+          return d1 + d2;
+        },
+        neighbors: function(grid, node) {
+          var res = [];
+          var x = node.pos[0];
+          var y = node.pos[1];
+       
+          if(grid[x-1] && grid[x-1][y]) {
+            res.push(grid[x-1][y]);
+          }
+          if(grid[x+1] && grid[x+1][y]) {
+            res.push(grid[x+1][y]);
+          }
+          if(grid[x][y-1] && grid[x][y-1]) {
+            res.push(grid[x][y-1]);
+          }
+          if(grid[x][y+1] && grid[x][y+1]) {
+            res.push(grid[x][y+1]);
+          }
+          return res;
+        }
+      };
+
+      var placeWalls = function(grid) {
+        for(var x = 0; x < grid.length; x++) {
+          for(var y = 0; y < grid[x].length; y++) {
+            if(Math.floor((Math.random() * 100) + 1) > wallDensity) {
+              grid[x][y].type = -1;
+            }
+          } 
+        }
+      };
+
+      var drawGrid = function(grid) {
+        var c = document.getElementById("canvas");
+        var ctx = c.getContext("2d");
+        for(var x = 0; x < grid.length; x++) {
+          for(var y = 0; y < grid[x].length; y++) {
+            switch(grid[x][y].type) {
+                case -1:
+                    ctx.fillStyle = "#000";
+                    break;
+                case 1:
+                    ctx.fillStyle = "#ff0000";
+                    break;
+                case 2:
+                    ctx.fillStyle = "#00ff00";
+                    break;
+                case 3:
+                    ctx.fillStyle = "#ffff00";
+                    break;
+                default:
+                    ctx.fillStyle = "#dedede";
+            }
+            ctx.fillRect(x * 11, y * 11, 10, 10);
+          } 
+        }
+      };
+
+      if (document.getElementById('astar')) {
+          placeWalls(grid);
+          document.getElementById('astar').innerHTML = "A* search: " + JSON.stringify(astar.search(grid, grid[1][4], grid[8][7]));
+          drawGrid(grid);
+      }
+    }
+    </script>
+  </head>
+  <body onLoad="init();">
+    <canvas id="canvas" width="300" height="300" style="border:1px solid #000000;">
+    </canvas> 
+    <br>
+    <div id="astar">
+    </div>
+  </body>
+</html>

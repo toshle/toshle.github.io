@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <title>DFS/BFS</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+    var init = function() {
+      var graph = {
+          vertices: [{
+              edges: [1, 4]
+          }, {
+              edges: [0, 2, 3]
+          }, {
+              edges: [1, 3]
+          }, {
+              edges: [1, 2, 4]
+          }, {
+              edges: [0, 3]
+          }]
+      };
+
+      var graph2 = {
+          vertices: [{
+              edges: [1, 2, 3]
+          }, {
+              edges: [4, 5]
+          }, {
+              edges: [6]
+          }, {
+              edges: [5]
+          }, {
+              edges: []
+          }, {
+              edges: [3]
+          }, {
+              edges: []
+          }]
+      };
+
+      var bfs = function(graph, start) {
+
+        var Queue = [];
+        var visited = [];
+        var u, v;
+
+        Queue.push(start);
+
+        while (Queue.length > 0) {
+            u = Queue.splice(0, 1)[0];
+            visited.push(u);
+            for (var i = 0; i < graph.vertices[u].edges.length; i += 1) {
+                v = graph.vertices[u].edges[i];
+                if (Queue.indexOf(v) == -1 && visited.indexOf(v) == -1) {
+                    Queue.push(v);
+                }
+            }
+        }
+
+        return visited;
+      };
+
+      var dfs = function(graph, start) {
+
+        var Stack = [];
+        var visited = [];
+        var u, v;
+
+        Stack.push(start);
+
+        while (Stack.length > 0) {
+            u = Stack.pop();
+            visited.push(u);
+            for (var i = 0; i < graph.vertices[u].edges.length; i += 1) {
+                v = graph.vertices[u].edges[i];
+                if (Stack.indexOf(v) == -1 && visited.indexOf(v) == -1) {
+                    Stack.push(v);
+                }
+            }
+        }
+
+        return visited;
+      };
+
+      var iddfs = function(graph, start, goal) {
+        var DLS = function(node, depth, goal) {
+          console.log(node);
+          if(depth == 0 && node == goal) {
+            return node;
+          } else if(depth > 0) {
+            for (var i = 0; i < graph.vertices[node].edges.length; i += 1) {
+                v = graph.vertices[node].edges[i];
+                var found = DLS(v, depth-1, goal);
+                if(found != null) {
+                  return found;
+                }
+                
+            }
+          }
+          return null;
+        };
+
+        var visited = [];
+        var depth = 0;
+        while(true) {
+          console.log("Depth " + depth + ": ");
+          var found = DLS(start, depth, goal);
+          if(found != null) {
+              return found;
+          }
+          depth++;
+        }
+
+      };
+
+
+      if (document.getElementById('graph')) {
+          document.getElementById('graph').innerHTML = "Graph: " + JSON.stringify(graph);
+      }
+
+      if (document.getElementById('dfs')) {
+          document.getElementById('dfs').innerHTML = "DFS: " + JSON.stringify(dfs(graph, 0));
+      }
+
+      if (document.getElementById('bfs')) {
+          document.getElementById('bfs').innerHTML = "BFS: " + JSON.stringify(bfs(graph, 0));
+      }
+
+      if (document.getElementById('iddfs')) {
+          document.getElementById('iddfs').innerHTML = "IDDFS: " + JSON.stringify(iddfs(graph2, 0, 6));
+      }
+
+    }
+    </script>
+  </head>
+  <body onLoad="init();">
+    <div id="graph">
+    </div>
+    <br>
+    <div id="dfs">
+    </div>
+    <br>
+    <div id="bfs">
+    </div>
+    <br>
+    <div id="iddfs">
+    </div>
+  </body>
+</html>
