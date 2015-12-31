@@ -1,0 +1,234 @@
+<html>
+  <head>
+    <title>Gen/etc.</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+    var init = function() {
+
+      var data = [{"x":116,"y":404},{"x":161,"y":617},{"x":16,"y":97},{"x":430,"y":536},{"x":601,"y":504},{"x":425,"y":461},{"x":114,"y":544},{"x":127,"y":118},{"x":163,"y":357},{"x":704,"y":104},{"x":864,"y":125},{"x":847,"y":523},{"x":742,"y":170},{"x":204,"y":601},{"x":421,"y":377},{"x":808,"y":49},{"x":860,"y":466},{"x":844,"y":294},{"x":147,"y":213},{"x":550,"y":124},{"x":238,"y":313},{"x":57,"y":572},{"x":664,"y":190},{"x":612,"y":644},{"x":456,"y":154},{"x":120,"y":477},{"x":542,"y":313},{"x":620,"y":29},{"x":245,"y":246},{"x":611,"y":578},{"x":627,"y":373},{"x":534,"y":286},{"x":577,"y":545},{"x":539,"y":340},{"x":794,"y":328},{"x":855,"y":139},{"x":700,"y":47},{"x":275,"y":593},{"x":130,"y":196},{"x":863,"y":35}];
+
+
+      var gen = {
+        running: false,
+        POPULATION_START_SIZE: 30,
+        best: [],
+        bestValue: 0,
+        population: [],
+        currentGeneration: 0,
+        mutationTimes: 0,
+        points: [],
+
+        init: function(data) {
+          this.points = data;
+          for(var i = 0; i < this.POPULATION_START_SIZE; i++) {
+            this.population.push(this.randomIndividual(this.points.length));
+          }
+          //this.setBest();
+        },
+
+        nextGen: function() {
+          this.currentGeneration++;
+          this.setBest();
+          this.select();
+          this.crossover();
+          this.mutate();
+          this.setBest();
+        },
+
+        getBest: function() {
+          var distances = this.getDistances();
+          var min = distances.slice(0).sort()[0];
+          return min;
+        },
+
+        getDistances: function() {
+          var distances = new Array(this.population.length);
+          for(var i = 0; i < this.population.length - 1; i++) {
+            distances[i] = this.evaluate(this.population[i]);
+          }
+          return distances;
+        },
+
+        setBest: function() {
+          var distances = this.getDistances();
+          var min = distances.slice(0).sort(function(a,b) {
+            return a-b;
+          })[0];
+          if(min > this.bestValue && this.bestValue != 0) {
+            return;
+          }
+          if(this.best.length != 0) {
+            if(this.population[distances.indexOf(min)] < this.evaluate(this.best)) {
+              this.best = this.population[distances.indexOf(min)];
+              this.bestValue = this.evaluate(this.best);
+            }
+          } else {
+            this.best = this.population[distances.indexOf(min)];
+            this.bestValue = this.evaluate(this.best);
+          }
+          
+            this.best = this.population[distances.indexOf(min)];
+            this.bestValue = this.evaluate(this.best);
+        },
+
+        select: function() {
+          var parents = new Array();
+          var distances = this.getDistances();
+          parents.push(this.population[distances.indexOf(this.getBest())].slice(0));
+          parents.push(this.best.slice(0));
+
+          var pop = this.population.slice(0);
+          var that = this;
+          pop.sort(function(a,b) {
+            return that.evaluate(a) - that.evaluate(b);
+          });
+
+          var min = this.evaluate(pop[0]);
+          var max = this.evaluate(pop[pop.length - 1]);
+
+          for(var i = 1; i < pop.length - 1; i++) {
+            var rand = Math.floor(Math.random() * (max - min + 1)) + min;
+            if(this.evaluate(pop[i]) - rand <= 0) {
+              parents.push(pop[i].slice(0));
+            } else if(this.evaluate(pop[i]) - rand < this.evaluate(pop[i+1]) - rand) {
+              parents.push(pop[i].slice(0));
+            } else {
+              parents.push(pop[i+1].slice(0));
+            }
+          }
+
+          this.population = parents.slice(0);
+        },
+
+        crossover: function(){
+          for(var i = 0; i < this.population.length - 1; i += 2) {
+            this.mate(i, i+1);
+          }
+        },
+
+        mate: function(parentA, parentB) {
+          var pop = this.population.slice(0);
+          pop.sort(function() { return 0.5 - Math.random() });
+
+          var half_length = Math.ceil(pop[parentA].length / 2);
+
+          var leftSideA = pop[parentA].slice(0, half_length);
+          var leftSideB = pop[parentB].slice(0, half_length);
+
+          pop[parentA] = leftSideA.concat(pop[parentA].slice(half_length, pop[parentA].length));
+          pop[parentB] = leftSideB.concat(pop[parentB].slice(half_length, pop[parentB].length));
+
+          population = pop;
+        },
+
+        mutate: function(){
+          for(var i=0; i<this.population.length - 1; i++) {
+            if(Math.random() < 0.6) {
+              this.population[i] = this.doMutate(population[i]);
+            }
+          }
+        },
+
+        doMutate: function(seq) {
+          this.mutationTimes++;
+          do {
+            m = parseInt(Math.random() * (seq.length - 2));
+            n = parseInt(Math.random() * (seq.length));
+          } while (m >= n)
+
+            for(var i = 0, j = (n-m+1)>>1; i < j; i++) {
+              var temp = seq[m+i];
+              seq[m+i] = seq[n-i];
+              seq[n-i] = temp;
+            }
+            return seq;
+        },
+
+        evaluate: function(individual) {
+          var sum = this.distance(individual[1], individual[individual.length - 1]);
+          for(var i = 1; i < individual.length - 1; i++) {
+            sum += this.distance(individual[i], individual[i-1]);
+          }
+          return sum;
+        },
+
+        distance: function(point1, point2) {
+          var dx = this.points[point1].x - this.points[point2].x;
+          var dy = this.points[point1].y - this.points[point2].y;
+          return ~~Math.sqrt(dx*dx + dy*dy);
+        },
+
+        randomIndividual: function(n) {
+          var a = [];
+          for(var i=0; i<n; i++) {
+            a.push(i);
+          }
+          return a.sort(function() { return 0.5 - Math.random() });
+        }
+      }
+
+      var c = document.getElementById("canvas");
+      var ctx = c.getContext("2d");
+      var WIDTH = c.width;
+      var HEIGHT = c.height;
+      gen.init(data);
+      setInterval(draw, 10);
+
+      function drawCircle(point) {
+        ctx.fillStyle   = '#000';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, Math.PI*2, true);
+        ctx.closePath();
+        ctx.fill();
+      }
+      function drawLines(array) {
+        ctx.strokeStyle = '#f00';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+
+        ctx.moveTo(gen.points[array[0]].x, gen.points[array[0]].y);
+        for(var i=1; i<array.length; i++) {
+          ctx.lineTo(gen.points[array[i]].x, gen.points[array[i]].y )
+        }
+        ctx.lineTo(gen.points[array[0]].x, gen.points[array[0]].y);
+
+        ctx.stroke();
+        ctx.closePath();
+      }
+      function draw() {
+        if(gen.running) {
+          gen.nextGen();
+          document.getElementById('status').innerHTML = "There are " + gen.points.length + " cities in the map, "
+                            +"the " + gen.currentGeneration + "th generation with "
+                            + gen.mutationTimes + " times of mutation. best value: "
+                            + ~~(gen.bestValue);
+        } else {
+          document.getElementById('status').innerHTML = "There are " + gen.points.length + " Cities in the map. ";
+        }
+        clearCanvas();
+        if (gen.points.length > 0) {
+          for(var i=0; i<gen.points.length; i++) {
+            drawCircle(gen.points[i]);
+          }
+          if(gen.best.length === gen.points.length) {
+            drawLines(gen.best);
+          }
+        }
+      }
+      function clearCanvas() {
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      }
+
+
+      gen.running = true;
+    }
+    </script>
+  </head>
+  <body onLoad="init();">
+    <canvas id="canvas" width="880" height="660" style="border:1px solid #000000;">
+    </canvas> 
+    <br>
+    <div id="status">
+    </div>
+  </body>
+</html>
