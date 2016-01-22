@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Javascript - OOP, closures, promises, basic design patterns</title>
+    <meta charset="UTF-8">
+    <link href="resources/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <nav class="floating-nav">
+      <a href="#content">Начало</a>
+      <a href="#oop">JavaScript OOP</a>
+      <a href="#closures">Клоужъри</a>
+      <a href="#promises">Промиси</a>
+      <a href="#dp">Design Patterns</a>
+      <a href="#about">About секция</a>
+    </nav>
+    <div id="content">
+      <h1>Javascript ООП - Какво ТРЯБВА да знаете</h1>
+      <p>
+        Обектното Ориентирано Програмиране (ООП) засяга използването на самостоятелни парчета код за разработката на приложения. Наричаме тези самостоятелни парчета код обекти, в повечето ООП езици класове, а в Javascript - функции. Използването на обекти ни дава възможност да се възползваме от някои ценни техники, като Наследяване(обектите могат да наследят свойствата от други обекти), Полиморфизъм(обектите споделят един и същ интерфейс - как се достъпват и се използват - докато вътрешната им имплементация може да е различна), и Енкапсулация
+      </p>
+      <p>
+        Ние се интересуваме само от Наследяването и Енкапсулацията, тъй като само тези двете понятия важат за ООП в Javascript. Ще се фокусираме само върху двете най добри техники за имлементиране на ООП в Javascript.
+      </p>
+
+      <h2>Енкапсулация и Наследяване - Overview</h2>
+      <p>
+        Обектите са главните герои или основните "неща", които вършат цялата работа. Те са навсякъде в Javascript, тъй като всеки компонент в езика е обект, включително функциите, стринговете, числата. Обикновено използваме литерали или конструктор функции за създаването на обекти. 
+      </p>
+      <p>
+        Енкапсулацията се отнася за затварянето на цялата функционалност на обект, в самия обект, така че вътрешните методи и свойства са скрити от останалата част на приложението. Това ни позволява да зададем специфичен набор от функционалности за обектите.
+      </p>
+      <p>
+        Наследяването се отнася за възможността на даден обект да наследи методите и свойствата на обект родител(клас в другите ООП езици, или функция в Javascript)
+      </p>
+      <p>
+        Инстанция е копие(или "дете") на функция или обект. Например:
+      </p>
+      <pre>
+        <code>
+          // Tree е конструктор функция и ще използваме ключовата дума new за да направим инстанция.​
+          ​function Tree(typeOfTree) {}
+          ​
+          ​// appleTree е инстанция на Tree.​
+          ​var appleTree = new Tree("Ябълка");
+        </code>
+      </pre>
+
+      <h2 id="oop">ООП в Javascript</h2>
+      <p>
+        Двата важни принципа от ООП в Javascript са Object Creation pattern(Енкапсулация) и Code Reuse patterns(Наследяване). Има много начини за създаване на обекти: може да се използва обект литерал, например:
+      </p>
+      <pre>
+        <code>
+          var myObj = {name: "Росен", profession: "Програмист"}; 
+        </code>
+      </pre>
+      <p>
+        Може да се използва prototype патърна, добавяме всеки метод и пропърти директно в прототипа на обекта. Например:
+      </p>
+      <pre>
+        <code>
+          function Employee() {}
+          ​
+          Employee.prototype.firstName = "Росен";
+          Employee.prototype.lastName = "Рачев";
+          Employee.prototype.startDate = new Date();
+          Employee.prototype.signedNDA = true;
+          Employee.prototype.fullName = function () {
+            console.log (this.firstName + " " + this.lastName); 
+          };
+          ​
+          ​var rosen = new Employee();
+          console.log(rosen.fullName()); // Росен Рачев
+          console.log(rosen.signedNDA); // true
+        </code>
+      </pre>
+      <p>
+        Също може да се използва и конструктор патърна, с консктруктор функция. Например:
+      </p>
+      <pre>
+        <code>
+          function Employee(name, profession) {
+            ​this.name = name;
+            ​this.profession = profession;
+          } // Employee() е конструктор функцията и излозваме new за да я извикаме като създаваме инстанция.​
+          ​
+          ​var rosen = new Employee(“Росен”, “Програмист”); // rosen е нов обект, който създаваме с Employee() конструктора.​
+          ​
+          console.log(rosen.name); // Росен
+          console.log(rosen.profession); // Програмист
+        </code>
+      </pre>
+      <p>
+        Javascript девелъпърите са измислили много начини за създаване на обекти, чрез конструктор функции и когато кажем Object Creation patterns, имаме предвид точно тези начини.
+      </p>
+      <p>
+        В добавка към патърните за създаване на обекти, искаме да преизползваме код ефикасно. Когато създаваме обект, най-вероятно ще искаме той да наследи(да има подобна функционалност) методите и свойствата от друг обект(родител), и освен това да има собствени методи и свойства. Патърните за преизоплзаване на код ни дават начини за имплементиране на наследяването.
+      </p>
+      <p>
+        Тези два универсални принципа - създаването на обекти(чрез конструктор функции) и наследяване на методи и пропъртита - са основните концепции на ООП в Javascript.
+      </p>
+
+      <h2>Енкапсулация</h2>
+      <p>(Най-добрия object creation pattern - комбинация конструктор/прототип)</p>
+      <p>
+        Когато искаме да създадем обект с цел пазене на информация, можем просто да използваме литерала.
+      </p>
+
+      <h4>Имплементация на комбинация конструктор/прототип</h4>
+
+      <pre>
+        <code>
+          function User (theName, theEmail) {
+            this.name = theName;
+            this.email = theEmail;
+            this.quizScores = [];
+            this.currentScore = 0;
+          }
+          ​
+          User.prototype = {
+            constructor: User,
+            saveScore:function (theScoreToAdd)  {
+              this.quizScores.push(theScoreToAdd)
+            },
+            showNameAndScores:function ()  {
+              var scores = this.quizScores.length > 0 ? this.quizScores.join(",") : "Няма точки";
+              return this.name + " Точки: " + scores;
+            },
+            changeEmail:function (newEmail)  {
+              this.email = newEmail;
+              return "Нов email: " + this.email;
+            }
+          }
+        </code>
+      </pre>
+
+      <pre>
+        <code>
+          // Потребител
+          firstUser = new User("Rosen", "rosen@example.com"); 
+          firstUser.changeEmail("rosen.rachev@example.com");
+          firstUser.saveScore(15);
+          firstUser.saveScore(10); 
+          ​
+          firstUser.showNameAndScores(); //Rosen Точки: 15,10​
+          ​
+          ​// Друг потребител
+          secondUser = new User("Peter", "peter@example.com");
+          secondUser.saveScore(18);
+          secondUser.showNameAndScores(); //Peter Точки: 18
+        </code>
+      </pre>
+
+      <p>
+        Реализирахме <code>User</code> конструктор, където се инициализират и задават инстанционните свойства(т.е. свойствата, които са различни за всяка инстанция). Тъй като функциите в Javascript са обекти присвояваме стойностите с ключовата дума <code>this</code>:
+      </p>
+      <pre>
+        <code>
+          this.name = theName;
+          ​this.email = theEmail;
+          ​this.quizScores = [];
+          ​this.currentScore = 0;
+        </code>
+      </pre>
+      <p>
+        Презаписването на прототипа по този начин е просто за удобство, за да не се налага да пишем всеки път <code>User.prototype</code>
+      </p>
+      <pre>
+        <code>
+          User.prototype = {
+            constructor: User,
+            saveScore:function (theScoreToAdd)  {
+                this.quizScores.push(theScoreToAdd)
+            },
+            showNameAndScores:function ()  {
+                var scores = this.quizScores.length > 0 ? this.quizScores.join(",") : "Няма точки";
+                return this.name + " Точки: " + scores;
+            },
+            changeEmail:function (newEmail)  {
+                this.email = newEmail;
+                return "Нов email: " + this.email;
+            }
+          }
+        </code>
+      </pre>
+      <p>
+        Чрез презаписването на прототипа с този нов обект литерал, имаме всички методи на едно място. Така всяка инстанция от тип <code>User</code> ще има достъп до методите в прототипа.
+      </p>
+    
+      <h2>Наследяване</h2>
+      <p>
+        За да имплементираме наследяването, можем да използваме две техники, които са измислени специално за наследяването в Javascript.
+      </p>
+      <p>
+        Prototypal Inheritance от Дъглас Крокфорд- използва създадения от Крокфорд метод <code>Object.create</code>
+      </p>
+      <pre>
+        <code>
+          if (typeof Object.create !== 'function') {
+              Object.create = function (o) {
+                  function F() {
+                  }
+          
+                  F.prototype = o;
+                  return new F();
+              };
+          }
+        </code>
+      </pre>
+      <p>Този метод е имплементиран в ECMAScript5 спецификацията, и може да бъде достъпен чрез <code>Object.create()</code></p>
+      <p>Следва да направим <code>inheritPrototype</code> функцията</p>
+      <pre>
+        <code>
+          function inheritPrototype(childObject, parentObject) {
+              //Използваме по-горния метод на Крокфорд за да копираме пропъртитата и методите от parentObject в childObject
+              //Така copyOfParent обекта вече има всичко което има и parentObject
+              var copyOfParent = Object.create(parentObject.prototype);
+              
+              //Тогава насочваме конструктора на този нов обект да към childObject
+              //Защо правим това ръчно, ще видим след малко
+              copyOfParent.constructor = childObject;
+              
+              //Тогава заместваме прототипа на childObject с copyOfParent
+             childObject.prototype = copyOfParent;
+          }
+        </code>
+      </pre>
+      <p>Експлицитно сменихме конструктора на <code>copyOfParent</code>, защото при <code>Object.create</code> всъщност правим следното:</p>
+      <pre>
+        <code>
+          // Създадохме нов обект и му презаписахме прототипа с прототипа на parentObject
+          function F() {
+          }
+          F.prototype = parentObject.prototype;
+          // Тогава този нов обект F присвоихме на copyOfParent
+          // Всичко това се случва вътре в Object.create
+        </code>
+      </pre>
+
+      <h1 id="closures">JavaScript Closures</h1>
+
+      <p>
+        Клоужърите позволяват на Javascript девелъпърите да пишат по добър код. Използват се често и независимо от Javascript опита ви без съмнение ще ги срещнете.
+      </p>
+
+      <h2>Какво е closure?</h2>
+      <p>
+        Клоужърът е вътрешна функция, която има достъп до променливите на външната(обгръщащата я) функция - scope chain. Клоужъра има три скоуп чейна: има достъп до собствената си област на видимост, има достъп до областта на видимост на обгръщащата функция, и достъп до глобания скоуп. Освен до променливите на външната функция, вътрешната има достъп и до параметрите и.
+      </p>
+      <p>Прост пример:</p>
+      <pre>
+        <code>
+          function showName(firstName, lastName) {
+            ​var nameIntro = "Your name is ";
+              // тази вътрешна функция има достъп до променливите, включително и параметрите
+            ​function makeFullName() {
+            ​  return nameIntro + firstName + " " + lastName;
+            }
+            ​
+            ​return makeFullName();
+            }
+            ​
+            showName("Michael", "Jackson"); // Твоето име е Michael Jackson
+        </code>
+      </pre>
+      <p>
+        Клоужърите се използват активно в Node.js. Те са работните коне в асинхронната, неблокираща архитектура на Node.js. Често се използват и в JQuery и почти всяко парче код на Javascript.
+      </p>
+      <p>Класически пример на JQuery:</p>
+      <pre>
+        <code>
+          $(function() {
+            ​var selections = []; 
+            $(".niners").click(function() { // Този клоужър има достъп до selections
+              selections.push (this.prop("name")); // Ъпдейтва selections в скоупа на външната функция
+            });
+          });
+        </code>
+      </pre>
+
+      <h4>Правила и странични ефекти на клоужърите</h4>
+
+      <ol>
+        <li>
+          <p>
+            Клоужърите имат достъп до променливите на външната функция дори след нейния <code>return</code>
+          </p>
+          <pre>
+            <code>
+    function celebrityName(firstName) {
+      var nameIntro = "Знаменитостта е ";
+      // тази вътрешна функция има достъп до променливите на външната, включително аргумента
+      function lastName(theLastName) {
+        return nameIntro + firstName + " " + theLastName;
+      }
+      return lastName;
+    }
+    ​
+    ​var mjName = celebrityName("Michael"); // тук в celebrityName вече се е изпълнил return.​
+    ​
+    //Тук клоужъра lastname се вика след изпълнен return на външната функция
+    //Но все още има достъп да променливите и аргумента
+    mjName("Jackson"); // This celebrity is Michael Jackson
+            </code>
+          </pre>
+        </li>
+        <li>
+          <p>
+            Клоужърите пазят референции към променливите и параметрите на външните функции, не пазят самата стойност
+          </p>
+          <pre>
+            <code>
+    function celebrityID() {
+        var celebrityID = 999;
+        // Връщаме обект с някакви вътрешни функции
+        // Всички те имат достъп до променливите на външната
+        return {
+          getID: function()  {
+            // Тази ще върне ъпдейтнато celebrityID
+            // Ще върне текущата стойност, дори когато setID я промени
+            return celebrityID;
+          },
+          setID: function(theNewID)  {
+            // Ще промени стойността на celebrityID
+            celebrityID = theNewID;
+          }
+        }
+      ​
+      }
+      ​
+      ​var mjID = celebrityID(); // return на celebrityID
+      mjID.getID(); // 999​
+      mjID.setID(567); // Сменя celebrtyID
+      mjID.getID(); // 567: Връща новата стойност
+            </code>
+          </pre>
+        </li>
+      </ol>
+
+      <h1 id="promises">JavaScript Promises</h1>
+      <p>
+        JS е single threaded, т.е. два скрипта не могат да се изпълняват по едно и също време, трябва да се изпълнят последователно. В браузърите JS споделя една нишка с доста други неща. ГТези неща се различават от браузър до браузър, но по принцип JS е в същаща опашка като рисуването, ъпдейтването на стиловете и потребителската интеракция. Ако едно от тези неща е активно, то забавя останалите.
+      </p>
+      <p>
+        Вероятно се ползвали събития с колбек функция за да заобиколите това:
+      </p>
+      <pre>
+        <code>
+          var img1 = document.querySelector('.img-1');
+
+          img1.addEventListener('load', function() {
+            // woo yey image loaded
+          });
+
+          img1.addEventListener('error', function() {
+            // argh everything's broken
+          });
+        </code>
+      </pre>
+
+      <p>
+        Взимаме изображението, добавяме няколко лисънъра, тогава JS може да спре да се изпълнява докато един от тези лисънъри не се извика.
+      </p>
+      <p>За нещастие, в горния пример, е възможно събитията да се случат преди да започнем да слушаме за тях, така че трябва да заобиколим и този проблем чрез "complete" пропъртито на изображенията.</p>
+      <pre>
+        <code>
+          var img1 = document.querySelector('.img-1');
+
+          function loaded() {
+            // woo yey image loaded
+          }
+
+          if (img1.complete) {
+            loaded();
+          }
+          else {
+            img1.addEventListener('load', loaded);
+          }
+
+          img1.addEventListener('error', function() {
+            // argh everything's broken
+          });
+        </code>
+      </pre>
+      <p>Това обаче не хваща изображения, които са се счупили преди да започнем да слушаме, за нещастие DOM-a не ни дава начин да правим това.</p>
+      <h3>Event-ите не са най-добрия начин</h3>
+      <p>Страхотни са за неща които се случват неколкократно на 1 обект - keyup, touchstart и т.н. Но когато ктане въпрос за асинхронен success/failure, бихме искали нещо такова:</p>
+
+      <pre>
+        <code>
+          img1.callThisIfLoadedOrWhenLoaded(function() {
+            // loaded
+          }).orIfFailedCallThis(function() {
+            // failed
+          });
+
+          // and…
+          whenAllTheseHaveLoaded([img1, img2]).callThis(function() {
+            // all loaded
+          }).orIfSomeFailedCallThis(function() {
+            // one or more failed
+          });
+        </code>
+      </pre>
+
+      <p>Това правят промисите, но с по-добро именуване. Ако HTML елементите имаха "ready" метод, който връщаше промис, можехме да направим:</p>
+
+      <pre>
+        <code>
+          img1.ready().then(function() {
+            // loaded
+          }, function() {
+            // failed
+          });
+
+          // and…
+          Promise.all([img1.ready(), img2.ready()]).then(function() {
+            // all loaded
+          }, function() {
+            // one or more failed
+          });
+        </code>
+      </pre>
+
+      <p>В най-базовия случай промисите са като лисънърите, но:</p>
+      <ul>
+        <li>Промис успява или се проваля само веднъж. Не може да го направи два пъти или да минава от успех към провал и обратното.</li>
+        <li>Ако промис е успял или се е провалил и по-късно добавим success/failure колбек, правилния колбек ще бъде извикан, въпреки че нещата са се случили по-рано</li>
+      </ul>
+
+      <p>Един промис може да бъде:</p>
+      <ul>
+        <li>fulfilled - успех</li>
+        <li>rejected - провал</li>
+        <li>pending - чака</li>
+        <li>settled - завършил е (или успех или провал)</li>
+      </ul>
+
+      <p>Ето как се създава:</p>
+      <pre>
+        <code>
+          var promise = new Promise(function(resolve, reject) {
+            // do a thing, possibly async, then…
+
+            if (/* everything turned out fine */) {
+              resolve("Stuff worked!");
+            }
+            else {
+              reject(Error("It broke"));
+            }
+          });
+        </code>
+      </pre>
+      <p>...</p>
+      <p>И как се използва:</p>
+      <pre>
+        <code>
+          promise.then(function(result) {
+            console.log(result); // "Stuff worked!"
+          }, function(err) {
+            console.log(err); // Error: "It broke"
+          });
+        </code>
+      </pre>
+
+
+      <h1 id="dp">Javascript дизайн патърни</h1>
+      <p>Всеки разработчик се стреми да пише четим, преизползваем и лесен за поддръжка код. Структурирането на кода става все по-важно с растежа на приложението.</p>
+      <p>Въпреки, че има огромен и разнообразен списък с дизайн патърни, ще разгледаме най-често срещаните</p>
+      <h3>Module</h3>
+      <p>
+        Използва се за отделяне на парчета код, който ще бъде независим от други компоненти.
+      </p>
+      <p>
+        В другите езици тези парчета код са познати като класове, модулите са класовете на JavaScript.
+      </p>
+      <pre>
+        <code>
+          var HTMLChanger = (function() {
+          var contents = 'contents'
+
+          var changeHTML = function() {
+            var element = document.getElementById('attribute-to-change');
+            element.innerHTML = contents;
+          }
+
+          return {
+            callChangeHTML: function() {
+              changeHTML();
+              console.log(contents);
+            }
+          };
+
+        })();
+
+        HTMLChanger.callChangeHTML();       // Outputs: 'contents'
+        console.log(HTMLChanger.contents);  // undefined
+        </code>
+      </pre>
+      <p>Те трябва да бъдат незабавно извикани функции (IIFE - Immediately-Invoked-Function-Expressions) за да се позволи private scope-a.</p>
+
+      <h3>Prototype</h3>
+      <p>Видяхме го при наследяването. Няма как един JavaScript разработчик да не се е сблъсквал с ключовата дума prototype, да е бил объркан от prototypical наследяването, или да е имплементирал прототипи в кода си.</p>
+
+
+      <h1 id="about">About сeкция</h1>
+      <p>Ресурси:</p>
+      <ul>
+        <li><a href="http://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/">http://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/</a></li>
+        <li><a href="http://javascriptissexy.com/understand-javascript-closures-with-ease/">http://javascriptissexy.com/understand-javascript-closures-with-ease/</a></li>
+        <li><a href="http://javascriptplayground.com/blog/2015/02/promises/">http://javascriptplayground.com/blog/2015/02/promises/</a></li>
+        <li><a href="https://scotch.io/bar-talk/4-javascript-design-patterns-you-should-know">https://scotch.io/bar-talk/4-javascript-design-patterns-you-should-know</a></li>
+      </ul>
+
+      <hr>
+      <h4>Автор:</h4>
+        <p>Росен Рачев 80851, 4 курс, група 8</p>
+    </div>
+  </body>
+</html>
