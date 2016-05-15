@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invitation - Drag n Drop</title>
+	<meta charset="utf-8" />
+	<style type="text/css">
+	body {
+		font-family: Verdana;
+	}
+	#target {
+		border: 3px dashed grey;
+		width: 600px;
+		height: 200px;
+		padding: 5px;
+		text-align: center;
+		font-size: 28px;
+		margin-top: 50px;
+	}
+	.cell {
+		float: left;
+		width: 100px;
+		height: 50px;
+		text-align: center;
+		padding-top: 25px;
+		margin: 5px;
+		cursor: move;
+	}
+	#demo-content {
+		width: 600px;
+		margin: auto;
+	}
+	</style>
+</head>
+<body>
+	<div id="demo-content">
+		<div id="target">Пусни тук</div>
+		<div id="what" draggable="true" class="cell">Какво?</div>
+		<div id="where" draggable="true" class="cell">Къде?</div>
+		<div id="when" draggable="true" class="cell">Кога?</div>
+		<div id="who" draggable="true" class="cell">Кой?</div>
+	</div>
+</body>
+<script type="text/javascript">
+	var dragIcon = document.createElement('img');
+	dragIcon.src = 'bg2.jpg';
+	dragIcon.height = '30px';
+
+	var info = {
+		what: "Drag and Drop<br>Лека презентацийка",
+		when: "19.05<br>последен по ред",
+		where: "ФМИ<br>зала 101",
+		who: "Росен Рачев<br>4ти курс<br>Компютърни науки"
+	}; 
+
+	var dragItems = document.querySelectorAll('[draggable=true]');
+
+	for (var i = 0; i < dragItems.length; i++) {
+	  dragItems[i].addEventListener('dragstart', function (event) {
+	    event.dataTransfer.setData('Text', this.id);
+	    event.dataTransfer.setDragImage(dragIcon, 100, 0);
+	  });
+	}
+
+	var target = document.querySelector('#target');
+
+	target.addEventListener('dragover', cancel);
+	target.addEventListener('dragenter', cancel);
+
+	target.addEventListener('drop', function (event) {
+	  // stops the browser from redirecting off to the text.
+	  if (event.preventDefault) {
+	    event.preventDefault(); 
+	  }
+
+	  this.innerHTML = '<p>' + info[event.dataTransfer.getData('Text')] + '</p>';
+
+	  return false;
+	});
+
+	function cancel(event) {
+	  if (event.preventDefault) {
+	    event.preventDefault();
+	  }
+	  return false;
+	}
+</script>
+</html>
